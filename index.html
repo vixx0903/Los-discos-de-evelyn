@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Los discos de Evelyn</title>
+  <style>
+    /* Estilos generales y colores cálidos */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #faf6f0;
+      color: #3d352e;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    /* Barra de navegación superior */
+    nav {
+      background-color: #e6d8c7;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #5c4332;
+      text-decoration: none;
+    }
+
+    .menu-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #5c4332;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .menu-links a:hover {
+      color: #c87d55;
+      text-decoration: underline;
+    }
+
+    /* Encabezado principal */
+    header {
+      padding: 40px 20px 20px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: #4a3525;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #705c4d;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Contenedor dividido: Animación a la izquierda + Discos centrados (3x2) */
+    .contenido-principal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 35px;
+      max-width: 1280px;
+      margin: 20px auto 50px;
+      padding: 0 20px;
+    }
+
+    .animacion-personaje {
+      position: relative;
+      width: 480px;
+      height: 620px;
+      flex-shrink: 0;
+      margin-top: -50px; 
+    }
+
+    /* Posicionamiento base para todas las imágenes del personaje */
+    .animacion-personaje img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Animación exclusiva y estricta para los 4 frames normales */
+    .frame-normal {
+      opacity: 0;
+      animation: secuenciaFrames 2s infinite steps(1);
+    }
+
+    /* Sincronización de los 4 fotogramas normales (0.5s cada uno) */
+    .frame-normal:nth-child(1) { animation-delay: 0s; }
+    .frame-normal:nth-child(2) { animation-delay: 0.5s; }
+    .frame-normal:nth-child(3) { animation-delay: 1.0s; }
+    .frame-normal:nth-child(4) { animation-delay: 1.5s; }
+
+    @keyframes secuenciaFrames {
+      0% { opacity: 1; }
+      25% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* Cuando el personaje reacciona, pausamos y ocultamos los normales */
+    #personaje.reaccionando .frame-normal {
+      animation-play-state: paused !important;
+      opacity: 0 !important;
+    }
+
+    /* Los frames especiales están ocultos por defecto y se controlan por JS */
+    .frame-especial {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Cuadrícula exacta de 3 en horizontal x 2 en vertical para los 6 discos */
+    .aparador {
+      display: grid;
+      grid-template-columns: repeat(3, 205px);
+      grid-template-rows: repeat(2, auto);
+      gap: 22px;
+      justify-content: center;
+    }
+
+    /* Tarjeta del disco con animación exagerada y rebote */
+    .disco {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 25px 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  box-shadow 0.35s ease, 
+                  border-color 0.35s ease;
+    }
+
+    .disco:hover {
+      transform: translateY(-16px) scale(1.08) rotate(2deg);
+      box-shadow: 0 20px 35px rgba(200, 125, 85, 0.25);
+      border-color: #c87d55;
+      z-index: 10;
+    }
+
+    .disco:nth-child(even):hover {
+      transform: translateY(-16px) scale(1.08) rotate(-2deg);
+    }
+
+    /* Simulación visual de un vinilo con surcos */
+    .vinilo {
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, 
+        #faf6f0 10%, 
+        #c87d55 12%, 
+        #c87d55 24%, 
+        #2b2623 26%, 
+        #1a1715 55%, 
+        #2e2926 57%, 
+        #1a1715 100%);
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .vinilo::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      width: 15px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      transform: rotate(-35deg);
+    }
+
+    @keyframes girarVinilo {
+      from { transform: scale(1.22) translateY(-8px) rotate(0deg); }
+      to   { transform: scale(1.22) translateY(-8px) rotate(360deg); }
+    }
+
+    .disco:hover .vinilo {
+      animation: girarVinilo 2.5s linear infinite;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .disco h3 {
+      margin: 10px 0 6px;
+      font-size: 1.15rem;
+      color: #4a3525;
+      transition: color 0.3s ease;
+    }
+
+    .disco:hover h3 {
+      color: #c87d55;
+    }
+
+    .disco p {
+      font-size: 0.9rem;
+      color: #7a6a5d;
+      margin-bottom: 18px;
+    }
+
+    /* Botón de acción */
+    .btn {
+      display: inline-block;
+      background-color: #c87d55;
+      color: white;
+      padding: 9px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+    }
+
+    .disco:hover .btn {
+      transform: scale(1.1);
+      background-color: #b06740;
+    }
+
+    /* Ajuste para pantallas pequeñas */
+    @media (max-width: 820px) {
+      .contenido-principal {
+        flex-direction: column;
+      }
+      .aparador {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menú Superior -->
+  <nav>
+    <a href="index.html" class="logo">💿 Los discos de Evelyn</a>
+    <div class="menu-links">
+      <a href="discos-base.html">Discos</a>
+      <a href="#recomendar">Recomendar canción</a>
+      <a href="#sobre">Sobre el proyecto</a>
+    </div>
+  </nav>
+
+  <!-- Bienvenida -->
+  <header>
+    <h1>🌟 Bienvenido! 🌟</h1>
+    <p>Elige el disco que mejor acompañe lo que sientes bro.</p>
+  </header>
+
+  <!-- Sección principal -->
+  <main class="contenido-principal">
+    
+    <!-- Animación del personaje -->
+    <div class="animacion-personaje" id="personaje">
+      <img src="evelyn1.jpg" alt="Frame 1" class="frame-normal">
+      <img src="evelyn2.jpg" alt="Frame 2" class="frame-normal">
+      <img src="evelyn3.jpg" alt="Frame 3" class="frame-normal">
+      <img src="evelyn4.jpg" alt="Frame 4" class="frame-normal">
+
+      <img src="evelyn5.jpg" alt="reaccion 1" class="frame-especial">
+      <img src="evelyn6.jpg" alt="reaccion 2 final" class="frame-especial">
+    </div>
+
+    <!-- Los 6 Discos (3x2) -->
+    <section id="discos" class="aparador">
+      
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>Remontar el semestre</h3>
+        <p>para los que remontan la unidad en una noche.</p>
+        <a href="disco-1.html" class="btn">Escuchar</a>
+      </div>
+
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>¿Te sientes solo?</h3>
+        <p>pues sientate bien! la gente aveces ocupa estar sola.</p>
+        <a href="disco-2.html" class="btn">Escuchar</a>
+      </div>
+
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>¿Tienes sueño?</h3>
+        <p>Un impulso para descanzar de forma tranquila.</p>
+        <a href="disco-3.html" class="btn">Escuchar</a>
+      </div>
+
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>Macho alfa</h3>
+        <p>Para desahogarte y soltar al lobo alfa que llevas dentro.</p>
+        <a href="disco-4.html" class="btn">Escuchar</a>
+      </div>
+
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>Proyectarse</h3>
+        <p>Las favoritas recomendadas por todos.</p>
+        <a href="disco-5.html" class="btn">Escuchar</a>
+      </div>
+
+      <div class="disco">
+        <div class="vinilo"></div>
+        <h3>para tus edits imaginarios</h3>
+        <p>Un tiki dos tikis tres tikis...</p>
+        <a href="disco-6.html" class="btn">Escuchar</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Script de interacción con los discos -->
+  <script>
+    const personaje = document.getElementById('personaje');
+    const discos = document.querySelectorAll('.disco');
+    const framesEspeciales = document.querySelectorAll('.frame-especial');
+    
+    // Objeto de audio apuntando a tu archivo clic.mp3
+    const sonidoBoton = new Audio('clic.mp3');
+
+    // 1. Interacción del personaje al pasar el mouse por los discos
+    discos.forEach(disco => {
+      disco.addEventListener('mouseenter', () => {
+        personaje.classList.add('reaccionando');
+        
+        framesEspeciales[0].style.opacity = '1';
+        framesEspeciales[1].style.opacity = '0';
+        
+        setTimeout(() => {
+          if (personaje.classList.contains('reaccionando')) {
+            framesEspeciales[0].style.opacity = '0';
+            framesEspeciales[1].style.opacity = '1';
+          }
+        }, 150);
+      });
+
+      disco.addEventListener('mouseleave', () => {
+        personaje.classList.remove('reaccionando');
+        framesEspeciales[0].style.opacity = '0';
+        framesEspeciales[1].style.opacity = '0';
+      });
+    });
+
+    // 2. Efecto de sonido y navegación para los botones "Escuchar"
+    const botonesEscuchar = document.querySelectorAll('.btn');
+
+    botonesEscuchar.forEach(boton => {
+      boton.addEventListener('click', (e) => {
+        e.preventDefault(); // Pausa un instante para que el sonido alcance a reproducirse
+        const enlaceDestino = boton.getAttribute('href');
+
+        sonidoBoton.currentTime = 0; // Reinicia el audio por si hacen clic rápido varias veces
+        
+        let reproduccion = sonidoBoton.play();
+
+        if (reproduccion !== undefined) {
+          reproduccion.then(() => {
+            // Si el audio sonó bien, esperamos 250 milisegundos y cambia de página
+            setTimeout(() => {
+              window.location.href = enlaceDestino;
+            }, 250);
+          }).catch(() => {
+            // Si el navegador bloqueó el audio por políticas internas, salta a la página de inmediato
+            window.location.href = enlaceDestino;
+          });
+        } else {
+          window.location.href = enlaceDestino;
+        }
+      });
+    });
+  </script>
