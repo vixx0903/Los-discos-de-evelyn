@@ -3,110 +3,560 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Canciones</title>
+  <title>Los discos de Evelyn - Lista de Canciones</title>
+  <!-- Tipografías modernas de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #faf6f0;
-      color: #3d352e;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-crema: #faf6f0;
+      --bg-tarjeta: #ffffff;
+      --cafe-oscuro: #3d2c20;
+      --cafe-medio: #6b5344;
+      --acento-terracota: #c87d55;
+      --acento-hover: #a8623d;
+      --borde-suave: #ede2d5;
     }
 
-    /* Barra superior */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-crema);
+      background-image: radial-gradient(#dfd3c3 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--cafe-oscuro);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Video de fondo a pantalla completa cuando suena una canción (sin opacidad reducida) */
+    #videoFondoCancion {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1;
+      pointer-events: none;
+      filter: grayscale(100%) contrast(1.05);
+    }
+
+    body.modo-cancion.tiene-video-fondo #videoFondoCancion {
+      display: block;
+    }
+
+    body.modo-cancion.tiene-video-fondo {
+      background-color: #000000;
+      background-image: none;
+    }
+
+    /* Fondo negro, tonos en blanco y negro y bordes en blanco solo cuando una canción/video está activa */
+    body.modo-cancion {
+      --cafe-oscuro: #ffffff;
+      --cafe-medio: #d9d9d9;
+      --borde-suave: #ffffff;
+      --acento-terracota: #9e9e9e;
+      --acento-hover: #bdbdbd;
+      background-color: #000000;
+      background-image: radial-gradient(#262626 1px, transparent 1px);
+      color: #ffffff;
+    }
+
+    body.modo-cancion nav,
+    body.modo-cancion .contenedor-lista,
+    body.modo-cancion .vinilo,
+    body.modo-cancion .btn-yt,
+    body.modo-cancion #reproductorCancionBox,
+    body.modo-cancion #btnMusicaFondo,
+    body.modo-cancion #toastNowPlaying {
+      filter: grayscale(100%);
+    }
+
+    body.modo-cancion nav {
+      background-color: #0c0c0c;
+      border-bottom-color: #ffffff;
+    }
+
+    body.modo-cancion .logo,
+    body.modo-cancion .info-disco h1,
+    body.modo-cancion .info-disco p,
+    body.modo-cancion .titulo-cancion,
+    body.modo-cancion .nombre-artista,
+    body.modo-cancion .encabezado-columnas {
+      color: #ffffff;
+    }
+
+    body.modo-cancion .btn-volver {
+      background-color: #141414;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    body.modo-cancion .btn-volver:hover {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    body.modo-cancion .contenedor-lista {
+      background: #0d0d0d;
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+      animation-play-state: paused;
+    }
+
+    body.modo-cancion .cabecera-disco {
+      border-bottom-color: #ffffff;
+    }
+
+    body.modo-cancion .etiqueta-contador {
+      background-color: #1c1c1c;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+    }
+
+    body.modo-cancion .fila-cancion {
+      background-color: #141414;
+      border-color: #ffffff;
+      color: #ffffff;
+    }
+
+    body.modo-cancion .fila-cancion:hover,
+    body.modo-cancion .fila-cancion.activa {
+      background-color: #1f1f1f;
+      border-color: #ffffff;
+    }
+
+    body.modo-cancion #reproductorCancionBox {
+      border-color: #ffffff;
+    }
+
+    body.modo-cancion #btnMusicaFondo {
+      background-color: #141414;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    body.modo-cancion #btnMusicaFondo:hover,
+    body.modo-cancion #btnMusicaFondo.activa {
+      background-color: #7a7a7a;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    /* Barra superior con efecto cristal */
     nav {
-      background-color: #e6d8c7;
-      padding: 15px 30px;
+      background-color: rgba(250, 246, 240, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--borde-suave);
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background-color 0.4s ease, border-color 0.4s ease, filter 0.4s ease;
     }
 
     .logo {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #5c4332;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cafe-oscuro);
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.4s ease;
     }
 
-    .btn-volver { text-decoration: none;
-      color: #5c4332;
-      font-weight: bold;
-      background-color: #faf6f0;
-      padding: 6px 14px;
-      border-radius: 15px;
+    .btn-volver {
+      text-decoration: none;
+      color: var(--cafe-oscuro);
+      font-weight: 600;
+      background-color: #ffffff;
+      border: 1px solid var(--borde-suave);
+      padding: 8px 18px;
+      border-radius: 50px;
       font-size: 0.9rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 6px rgba(61, 44, 32, 0.04);
     }
 
-    /* Contenedor principal de la lista */
+    .btn-volver:hover {
+      background-color: var(--cafe-oscuro);
+      color: #ffffff;
+      transform: translateX(-3px);
+    }
+
+    /* Cuadro principal con tambaleo suave de lado a lado */
     .contenedor-lista {
-      max-width: 750px;
-      margin: 40px auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-width: 780px;
+      margin: 45px auto;
+      background: var(--bg-tarjeta);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(92, 67, 50, 0.08);
+      border: 1px solid var(--borde-suave);
+      transform-origin: center center;
+      animation: tambalearCuadro 4.8s ease-in-out infinite;
+      position: relative;
+      z-index: 10;
+      transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
     }
 
+    @keyframes tambalearCuadro {
+      0%, 100% {
+        transform: translateX(-5px) rotate(-1.4deg);
+      }
+      50% {
+        transform: translateX(5px) rotate(1.4deg);
+      }
+    }
+
+    /* Cabecera estilo portada de álbum */
     .cabecera-disco {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 35px;
+      padding-bottom: 30px;
+      border-bottom: 1px dashed #d8c7b4;
+      transition: border-color 0.4s ease;
+    }
+
+    /* Vinilo animado en CSS puro */
+    .vinilo {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: repeating-radial-gradient(
+        #1e1b18,
+        #1e1b18 4px,
+        #2d2824 5px,
+        #1e1b18 6px
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      animation: girar 12s linear infinite;
+      position: relative;
+      transition: filter 0.4s ease;
+    }
+
+    .vinilo::after {
+      content: "";
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #faf6f0 18%, var(--acento-terracota) 20%);
+      border: 2px solid #f0e6d8;
+    }
+
+    @keyframes girar {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .info-disco h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin: 0 0 8px;
+      color: var(--cafe-oscuro);
+      transition: color 0.4s ease;
+    }
+
+    .info-disco p {
+      margin: 0 0 12px;
+      color: var(--cafe-medio);
+      line-height: 1.5;
+      font-size: 0.98rem;
+      transition: color 0.4s ease;
+    }
+
+    .etiqueta-contador {
+      display: inline-block;
+      background-color: #f4ebe1;
+      color: var(--cafe-oscuro);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* Lista de canciones con Grid (crecimiento parejo sin deformarse) */
+    .lista-canciones {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .encabezado-columnas {
+      display: grid;
+      grid-template-columns: 45px 1.4fr 1.2fr 125px;
+      align-items: center;
+      padding: 0 18px 6px;
+      color: #968172;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      transition: color 0.4s ease;
+    }
+
+    .encabezado-columnas span:first-child {
       text-align: center;
-      margin-bottom: 30px;
-      border-bottom: 1px solid #e6d8c7;
-      padding-bottom: 20px;
     }
 
-    .cabecera-disco h1 {
-      margin: 0 0 10px;
-      color: #4a3525;
+    .encabezado-columnas span:last-child {
+      text-align: right;
     }
 
-    .cabecera-disco p {
-      margin: 0;
-      color: #7a6a5d;
-    }
-
-    /* Tabla alineada para Canción / Artista / Enlace */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      text-align: left;
-      padding: 12px;
-      color: #5c4332;
-      border-bottom: 2px solid #e6d8c7;
+    .fila-cancion {
+      display: grid;
+      grid-template-columns: 45px 1.4fr 1.2fr 125px;
+      align-items: center;
+      padding: 15px 18px;
+      background-color: #fcfaf7;
+      border: 1.5px solid #f0e7dc;
+      border-radius: 16px;
       font-size: 0.95rem;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.25s ease,
+                  border-color 0.4s ease,
+                  box-shadow 0.3s ease,
+                  color 0.4s ease;
     }
 
-    td {
-      padding: 14px 12px;
-      border-bottom: 1px solid #f0e8de;
-      font-size: 0.95rem;
+    .fila-cancion:hover {
+      background-color: #ffffff;
+      border-color: var(--acento-terracota);
+      transform: scale(1.03) translateY(-3px);
+      box-shadow: 0 12px 24px rgba(200, 125, 85, 0.2);
+      z-index: 10;
     }
 
-    tr:hover {
-      background-color: #fdfaf6;
+    .fila-cancion.activa {
+      border-color: var(--acento-terracota);
+      box-shadow: 0 12px 26px rgba(200, 125, 85, 0.25);
+    }
+
+    .numero-cancion {
+      font-weight: 700;
+      color: var(--acento-terracota);
+      text-align: center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .fila-cancion:hover .numero-cancion {
+      transform: scale(1.2);
+    }
+
+    .titulo-cancion {
+      font-weight: 700;
+      color: var(--cafe-oscuro);
+      padding-right: 10px;
+      transition: color 0.25s ease, transform 0.3s ease;
+    }
+
+    .fila-cancion:hover .titulo-cancion {
+      color: var(--acento-hover);
+    }
+
+    .nombre-artista {
+      color: var(--cafe-medio);
+      font-weight: 500;
+      padding-right: 10px;
+      transition: color 0.4s ease;
+    }
+
+    .accion-cancion {
+      text-align: right;
     }
 
     .btn-yt {
-      display: inline-block;
-      background-color: #c87d55;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--acento-terracota);
       color: white;
-      padding: 6px 14px;
-      border-radius: 15px;
+      padding: 8px 16px;
+      border-radius: 50px;
       text-decoration: none;
       font-size: 0.85rem;
-      font-weight: bold;
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+      box-shadow: 0 3px 8px rgba(200, 125, 85, 0.25);
     }
 
     .btn-yt:hover {
-      background-color: #b06740;
+      background-color: var(--acento-hover);
+      transform: scale(1.08);
+      box-shadow: 0 6px 14px rgba(200, 125, 85, 0.4);
+    }
+
+    /* Caja de video que aparece justo debajo de la canción seleccionada */
+    #reproductorCancionBox {
+      display: none;
+      transform: translateY(-6px);
+      border-radius: 18px;
+      overflow: hidden;
+      background-color: #14110f;
+      border: 2px solid var(--acento-terracota);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.45s ease, border-color 0.4s ease, filter 0.4s ease;
+      position: relative;
+      z-index: 25;
+    }
+
+    #reproductorCancionBox.visible {
+      display: block;
+      transform: translateY(0);
+    }
+
+    #reproductorCancionBox.desvaneciendo {
+      transform: translateY(-6px);
+    }
+
+    #reproductorCancionBox video {
+      width: 100%;
+      max-height: 340px;
+      display: block;
+      object-fit: cover;
+      background-color: #000000;
+    }
+
+    /* Botón flotante y cartel de música de fondo */
+    #btnMusicaFondo {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background-color: #faf6f0;
+      color: #5c4332;
+      border: 2px solid #c87d55;
+      padding: 10px 16px;
+      border-radius: 22px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(92, 67, 50, 0.16);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.2s ease,
+                  color 0.2s ease,
+                  border-color 0.4s ease,
+                  filter 0.4s ease;
+    }
+
+    #btnMusicaFondo:hover {
+      transform: scale(1.06);
+      background-color: #c87d55;
+      color: #ffffff;
+    }
+
+    #btnMusicaFondo.activa {
+      background-color: #c87d55;
+      color: #ffffff;
+    }
+
+    #toastNowPlaying {
+      position: fixed;
+      bottom: 22px;
+      left: 22px;
+      z-index: 998;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background-color: #2b2623;
+      border: 1px solid #e6d8c7;
+      color: #faf6f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.88rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+    }
+
+    #toastNowPlaying.visible {
+      display: flex;
+      transform: translateY(0);
+    }
+
+    #toastNowPlaying .np-label {
+      color: #e6b89c;
+      font-weight: 600;
+    }
+
+    #toastNowPlaying .np-track {
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    /* Adaptación para celulares */
+    @media (max-width: 650px) {
+      .cabecera-disco {
+        flex-direction: column;
+        text-align: center;
+      }
+      .contenedor-lista {
+        margin: 20px 15px;
+        padding: 25px 18px;
+      }
+      nav {
+        padding: 14px 18px;
+      }
+      .encabezado-columnas {
+        display: none;
+      }
+      .fila-cancion {
+        grid-template-columns: 35px 1fr auto;
+        grid-template-areas:
+          "num titulo boton"
+          "num artista boton";
+        gap: 2px 10px;
+        padding: 14px;
+      }
+      .numero-cancion {
+        grid-area: num;
+      }
+      .titulo-cancion {
+        grid-area: titulo;
+      }
+      .nombre-artista {
+        grid-area: artista;
+        font-size: 0.85rem;
+      }
+      .accion-cancion {
+        grid-area: boton;
+      }
+      .fila-cancion:hover {
+        transform: scale(1.02) translateY(-2px);
+      }
     }
   </style>
 </head>
 <body>
+  <video id="videoFondoCancion" loop muted playsinline></video>
 
   <!-- Menú Superior -->
   <nav>
@@ -114,60 +564,293 @@
     <a href="index.html" class="btn-volver">← Volver al inicio</a>
   </nav>
 
-  <!-- Lista de Canciones en Blanco -->
+  <!-- Contenedor Principal (se tambalea todo junto) -->
   <div class="contenedor-lista">
     
     <div class="cabecera-disco">
-      <h1>💿 Título del Disco o Categoría</h1>
-      <p>Escribe aquí una pequeña descripción o dedicatoria para este disco.</p>
+      <div class="vinilo"></div>
+      <div class="info-disco">
+        <h1>Para el sigma dentro de ti</h1>
+        <p>Espera que.</p>
+        <span class="etiqueta-contador">🎵 4 canciones en esta lista</span>
+      </div>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Canción</th>
-          <th>Artista</th>
-          <th>Enlace</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        <!-- Fila vacía 1 -->
-        <tr>
-          <td>1</td>
-          <td>[i kissed a girl]
-          <td>[katty perry]</td>
-          <td><a href="https://youtu.be/R208flHX9A8?si=vb6fgHIsL5uIqr7n" target="_blank" class="btn-yt">▶️ YouTube</a></td>
-        </tr>
+    <!-- Lista de canciones con tarjetas uniformes -->
+    <div class="lista-canciones" id="listaCanciones">
+      <div class="encabezado-columnas">
+        <span>#</span>
+        <span>Canción</span>
+        <span>Artista</span>
+        <span>Escuchar</span>
+      </div>
 
-        <!-- Fila vacía 2 -->
-        <tr>
-          <td>2</td>
-          <td>[Hot and cold]</td>
-          <td>[katty perry]</td>
-          <td><a href="https://youtu.be/dqTbcbbdnUc?si=Qs3SyppB9pZ4hHJJ" target="_blank" class="btn-yt">▶️ YouTube</a></td>
-        </tr>
+      <div class="fila-cancion"
+           data-audio="i_kissed_a_girl.mp3"
+           data-video="i_kissed_a_girl.mp4"
+           data-titulo="i kissed a girl [katty perry]">
+        <span class="numero-cancion">01</span>
+        <span class="titulo-cancion">i kissed a girl</span>
+        <span class="nombre-artista">katty perry</span>
+        <div class="accion-cancion">
+          <a href="https://youtu.be/R208flHX9A8?si=vb6fgHIsL5uIqr7n" target="_blank" rel="noopener noreferrer" class="btn-yt">
+            ▶ YouTube
+          </a>
+        </div>
+      </div>
 
-        <!-- Fila vacía 3 -->
-        <tr>
-          <td>3</td>
-          <td>[Blow]</td>
-          <td>[Ke$ha]</td>
-          <td><a href="https://youtu.be/CFWX0hWCbng?si=k1EQYaMC8RqP2tOu" target="_blank" class="btn-yt">▶️ YouTube</a></td>
-        </tr>
+      <div class="fila-cancion"
+           data-audio="hot_and_cold.mp3"
+           data-video="hot_and_cold.mp4"
+           data-titulo="Hot and cold [katty perry]">
+        <span class="numero-cancion">02</span>
+        <span class="titulo-cancion">Hot and cold</span>
+        <span class="nombre-artista">katty perry</span>
+        <div class="accion-cancion">
+          <a href="https://youtu.be/dqTbcbbdnUc?si=Qs3SyppB9pZ4hHJJ" target="_blank" rel="noopener noreferrer" class="btn-yt">
+            ▶ YouTube
+          </a>
+        </div>
+      </div>
 
-        <tr>
-          <td>4</td>
-          <td>[pilates]</td>
-          <td>[Ariabela]</td>
-          <td><a href="https://youtu.be/aHYvmY3nV5U?si=Sw4ErPZV2vXz2YnI" target="_blank" class="btn-yt">▶️ YouTube</a></td>
-        </tr>
+      <div class="fila-cancion"
+           data-audio="blow.mp3"
+           data-video="blow.mp4"
+           data-titulo="Blow [Ke$ha]">
+        <span class="numero-cancion">03</span>
+        <span class="titulo-cancion">Blow</span>
+        <span class="nombre-artista">Ke$ha</span>
+        <div class="accion-cancion">
+          <a href="https://youtu.be/CFWX0hWCbng?si=k1EQYaMC8RqP2tOu" target="_blank" rel="noopener noreferrer" class="btn-yt">
+            ▶ YouTube
+          </a>
+        </div>
+      </div>
 
-      </tbody>
-    </table>
+      <div class="fila-cancion"
+           data-audio="pilates.mp3"
+           data-video="pilates.mp4"
+           data-titulo="pilates [Ariabela]">
+        <span class="numero-cancion">04</span>
+        <span class="titulo-cancion">pilates</span>
+        <span class="nombre-artista">Ariabela</span>
+        <div class="accion-cancion">
+          <a href="https://youtu.be/aHYvmY3nV5U?si=Sw4ErPZV2vXz2YnI" target="_blank" rel="noopener noreferrer" class="btn-yt">
+            ▶ YouTube
+          </a>
+        </div>
+      </div>
+
+      <!-- Caja de video que aparece justo debajo de la canción seleccionada -->
+      <div id="reproductorCancionBox">
+        <video id="videoCancion" playsinline></video>
+      </div>
+    </div>
 
   </div>
 
+  <!-- Controles de música de fondo -->
+  <button type="button" id="btnMusicaFondo">🎵 Música: OFF</button>
+
+  <div id="toastNowPlaying">
+    <span class="np-label">🎶 Esta Sonando:</span>
+    <span class="np-track" id="textoNowPlaying">Veridis quo [Daft punk]</span>
+  </div>
+
+  <script>
+    const musicaFondo = new Audio('fondo.mp3');
+    musicaFondo.loop = true;
+    musicaFondo.volume = 0.35;
+
+    const audioCancion = new Audio();
+    audioCancion.volume = 0.85;
+
+    const btnMusica = document.getElementById('btnMusicaFondo');
+    const toastNowPlaying = document.getElementById('toastNowPlaying');
+    const textoNowPlaying = document.getElementById('textoNowPlaying');
+    const listaCanciones = document.getElementById('listaCanciones');
+    const reproductorBox = document.getElementById('reproductorCancionBox');
+    const videoCancion = document.getElementById('videoCancion');
+    const videoFondoCancion = document.getElementById('videoFondoCancion');
+    const filasCancion = document.querySelectorAll('.fila-cancion');
+
+    const CLAVE_ACTIVA = 'evelyn_musica_activa';
+    const CLAVE_TIEMPO = 'evelyn_musica_tiempo';
+    const NOMBRE_FONDO = 'Veridis quo [Daft punk]';
+
+    let cancionActivaFila = null;
+    let estabaFondoActivaAntes = false;
+    let temporizadorCierre = null;
+
+    function guardarEstado() {
+      localStorage.setItem(CLAVE_ACTIVA, !musicaFondo.paused ? '1' : '0');
+      localStorage.setItem(CLAVE_TIEMPO, musicaFondo.currentTime.toString());
+    }
+
+    function actualizarBoton() {
+      const estaSonando = !musicaFondo.paused;
+      btnMusica.textContent = estaSonando ? '🎵 Música: ON' : '🎵 Música: OFF';
+      btnMusica.classList.toggle('activa', estaSonando);
+
+      if (cancionActivaFila) {
+        textoNowPlaying.textContent = cancionActivaFila.dataset.titulo;
+        toastNowPlaying.classList.add('visible');
+      } else {
+        textoNowPlaying.textContent = NOMBRE_FONDO;
+        toastNowPlaying.classList.toggle('visible', estaSonando);
+      }
+      guardarEstado();
+    }
+
+    function detenerVideoFondo() {
+      document.body.classList.remove('tiene-video-fondo');
+      videoFondoCancion.pause();
+      videoFondoCancion.currentTime = 0;
+      videoFondoCancion.removeAttribute('src');
+      videoFondoCancion.load();
+    }
+
+    function activarVideoFondo(srcVideo) {
+      if (!srcVideo) {
+        detenerVideoFondo();
+        return;
+      }
+      document.body.classList.add('tiene-video-fondo');
+      videoFondoCancion.src = srcVideo;
+      videoFondoCancion.currentTime = 0;
+      videoFondoCancion.play().catch(() => {});
+    }
+
+    function cerrarCancionActiva() {
+      clearTimeout(temporizadorCierre);
+      reproductorBox.classList.add('desvaneciendo');
+      detenerVideoFondo();
+
+      temporizadorCierre = setTimeout(() => {
+        audioCancion.pause();
+        audioCancion.currentTime = 0;
+
+        videoCancion.pause();
+        videoCancion.currentTime = 0;
+        videoCancion.muted = true;
+        videoCancion.removeAttribute('src');
+        videoCancion.load();
+
+        reproductorBox.classList.remove('visible', 'desvaneciendo');
+        listaCanciones.appendChild(reproductorBox);
+        document.body.classList.remove('modo-cancion', 'tiene-video-fondo');
+
+        if (cancionActivaFila) {
+          cancionActivaFila.classList.remove('activa');
+          cancionActivaFila = null;
+        }
+
+        if (estabaFondoActivaAntes) {
+          musicaFondo.play().then(() => {
+            actualizarBoton();
+          }).catch(() => {
+            actualizarBoton();
+          });
+        } else {
+          actualizarBoton();
+        }
+      }, 500);
+    }
+
+    filasCancion.forEach((fila) => {
+      fila.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-yt')) return;
+
+        clearTimeout(temporizadorCierre);
+
+        if (cancionActivaFila === fila) {
+          cerrarCancionActiva();
+          return;
+        }
+
+        if (!cancionActivaFila) {
+          estabaFondoActivaAntes = !musicaFondo.paused;
+        }
+        musicaFondo.pause();
+
+        filasCancion.forEach((f) => f.classList.remove('activa'));
+        fila.classList.add('activa');
+        cancionActivaFila = fila;
+        document.body.classList.add('modo-cancion');
+
+        fila.insertAdjacentElement('afterend', reproductorBox);
+
+        const srcAudio = fila.dataset.audio;
+        const srcVideo = fila.dataset.video;
+
+        activarVideoFondo(srcVideo);
+
+        reproductorBox.classList.remove('desvaneciendo');
+        reproductorBox.classList.add('visible');
+
+        videoCancion.muted = true;
+        videoCancion.src = srcVideo;
+        videoCancion.currentTime = 0;
+        videoCancion.play().catch(() => {});
+
+        audioCancion.src = srcAudio;
+        audioCancion.currentTime = 0;
+        audioCancion.play().catch(() => {
+          videoCancion.muted = false;
+          videoCancion.play().catch(() => {});
+        });
+
+        actualizarBoton();
+      });
+    });
+
+    videoCancion.addEventListener('ended', () => {
+      cerrarCancionActiva();
+    });
+
+    audioCancion.addEventListener('ended', () => {
+      cerrarCancionActiva();
+    });
+
+    btnMusica.addEventListener('click', () => {
+      if (musicaFondo.paused) {
+        musicaFondo.play().then(() => {
+          actualizarBoton();
+        }).catch(() => {});
+      } else {
+        musicaFondo.pause();
+        actualizarBoton();
+      }
+    });
+
+    setInterval(() => {
+      if (!musicaFondo.paused) {
+        guardarEstado();
+      }
+    }, 500);
+
+    window.addEventListener('beforeunload', guardarEstado);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const estabaActiva = localStorage.getItem(CLAVE_ACTIVA) === '1';
+      const tiempoGuardado = parseFloat(localStorage.getItem(CLAVE_TIEMPO) || '0');
+
+      if (!isNaN(tiempoGuardado) && tiempoGuardado > 0) {
+        musicaFondo.addEventListener('loadedmetadata', () => {
+          musicaFondo.currentTime = tiempoGuardado % (musicaFondo.duration || tiempoGuardado + 1);
+        }, { once: true });
+      }
+
+      if (estabaActiva) {
+        musicaFondo.play().then(() => {
+          actualizarBoton();
+        }).catch(() => {
+          actualizarBoton();
+        });
+      } else {
+        actualizarBoton();
+      }
+    });
+  </script>
 </body>
 </html>

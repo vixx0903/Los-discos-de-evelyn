@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recomendar canción - Los discos de Evelyn</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #faf6f0;
+      color: #3d352e;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    nav {
+      background-color: #e6d8c7;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #5c4332;
+      text-decoration: none;
+    }
+
+    .menu-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #5c4332;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .menu-links a:hover {
+      color: #c87d55;
+      text-decoration: underline;
+    }
+
+    @keyframes entrarFormulario {
+      from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes girarLento {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes barraEcualizador {
+      0%, 100% { height: 6px; }
+      50% { height: 22px; }
+    }
+
+    .contenedor-form {
+      max-width: 580px;
+      margin: 40px auto 60px;
+      padding: 0 20px;
+      animation: entrarFormulario 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .tarjeta-form {
+      background: #ffffff;
+      border-radius: 26px;
+      padding: 34px 32px;
+      box-shadow: 0 14px 34px rgba(92, 67, 50, 0.1);
+      border: 2px solid #e6d8c7;
+      text-align: left;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .tarjeta-form:hover {
+      border-color: #c87d55;
+      box-shadow: 0 20px 42px rgba(200, 125, 85, 0.18);
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: 2px dashed #e6d8c7;
+      padding-bottom: 18px;
+      margin-bottom: 20px;
+    }
+
+    .header-izq {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mini-vinilo {
+      width: 66px;
+      height: 66px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, 
+        #faf6f0 12%, 
+        #c87d55 14%, 
+        #c87d55 28%, 
+        #2b2623 30%, 
+        #1a1715 58%, 
+        #2e2926 60%, 
+        #1a1715 100%);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: girarLento 6s linear infinite;
+      transition: animation-duration 0.3s ease;
+    }
+
+    .mini-vinilo.turbo {
+      animation: girarLento 0.5s linear infinite;
+    }
+
+    .form-header h1 {
+      margin: 0 0 4px;
+      font-size: 1.55rem;
+      color: #4a3525;
+    }
+
+    .form-header p {
+      margin: 0;
+      color: #7a6a5d;
+      font-size: 0.92rem;
+    }
+
+    .ecualizador {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 24px;
+      padding-right: 4px;
+    }
+
+    .ecualizador span {
+      width: 4px;
+      background-color: #c87d55;
+      border-radius: 4px;
+      animation: barraEcualizador 0.9s ease-in-out infinite;
+    }
+
+    .ecualizador span:nth-child(2) { animation-delay: 0.2s; }
+    .ecualizador span:nth-child(3) { animation-delay: 0.4s; }
+    .ecualizador span:nth-child(4) { animation-delay: 0.15s; }
+
+    .preview-caja {
+      background: linear-gradient(135deg, #faf6f0 0%, #f3e8d8 100%);
+      border: 1.5px solid #e6d8c7;
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .preview-texto {
+      font-size: 0.9rem;
+      color: #5c4332;
+    }
+
+    .preview-texto strong {
+      display: block;
+      font-size: 1rem;
+      color: #3d352e;
+    }
+
+    .preview-badge {
+      background-color: #c87d55;
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: bold;
+      padding: 5px 11px;
+      border-radius: 14px;
+      white-space: nowrap;
+    }
+
+    .campo {
+      margin-bottom: 16px;
+    }
+
+    .campo label {
+      display: block;
+      font-weight: bold;
+      color: #5c4332;
+      margin-bottom: 6px;
+      font-size: 0.94rem;
+    }
+
+    .campo input,
+    .campo select,
+    .campo textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 2px solid #e6d8c7;
+      background-color: #faf6f0;
+      color: #3d352e;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .campo input:focus,
+    .campo select:focus,
+    .campo textarea:focus {
+      outline: none;
+      border-color: #c87d55;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(200, 125, 85, 0.12);
+    }
+
+    .campo textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
+
+    .vibras-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .vibra-chip {
+      background-color: #faf6f0;
+      border: 1.5px solid #e6d8c7;
+      color: #5c4332;
+      padding: 5px 12px;
+      border-radius: 18px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .vibra-chip:hover {
+      transform: translateY(-2px);
+      border-color: #c87d55;
+    }
+
+    .vibra-chip.activa {
+      background-color: #c87d55;
+      border-color: #c87d55;
+      color: #ffffff;
+    }
+
+    .btn-enviar {
+      width: 100%;
+      margin-top: 6px;
+      background-color: #c87d55;
+      color: #ffffff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 22px;
+      font-size: 1.02rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(200, 125, 85, 0.28);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+    }
+
+    .btn-enviar:hover {
+      transform: scale(1.03);
+      background-color: #b06740;
+    }
+
+    .btn-respaldo {
+      background-color: #5c4332;
+      margin-top: 10px;
+      box-shadow: 0 6px 16px rgba(92, 67, 50, 0.2);
+    }
+
+    .btn-respaldo:hover {
+      background-color: #463225;
+    }
+
+    .nota-activacion {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: #7a6a5d;
+      text-align: center;
+    }
+
+    .btn-volver {
+      display: inline-block;
+      margin-top: 24px;
+      color: #5c4332;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-volver:hover {
+      color: #c87d55;
+      transform: translateX(-3px);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">💿 Los discos de Evelyn</a>
+    <div class="menu-links">
+      <a href="index.html">Inicio</a>
+      <a href="discos-base.html">Discos</a>
+      <a href="recomendar.html">Recomendar canción</a>
+      <a href="sobre-proyecto.html">Sobre el proyecto</a>
+    </div>
+  </nav>
+
+  <main class="contenedor-form">
+    <section class="tarjeta-form">
+      <div class="form-header">
+        <div class="header-izq">
+          <div class="mini-vinilo" id="viniloPreview"></div>
+          <div>
+            <h1>Recomendar una canción</h1>
+            <p>Graba tu sugerencia y envíamela directo</p>
+          </div>
+        </div>
+        <div class="ecualizador" title="Sonando...">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="preview-caja">
+        <div class="preview-texto">
+          <span>Vista previa del track:</span>
+          <strong id="textoCancionPreview">Escribe una canción abajo...</strong>
+        </div>
+        <span class="preview-badge" id="badgeDiscoPreview">Top música</span>
+      </div>
+
+      <form id="formRecomendacion" action="https://formspree.io/f/mnpdgnao" method="POST">
+        <input type="hidden" name="_subject" value="🎵 Nueva recomendación - Los discos de Evelyn">
+        <input type="hidden" name="_captcha" value="false">
+
+        <div class="campo">
+          <label for="nombre">Tu nombre o apodo:</label>
+          <input type="text" id="nombre" name="Nombre" placeholder="Ej. Evelyn" required>
+        </div>
+
+        <div class="campo">
+          <label for="cancion">Nombre de la canción y artista:</label>
+          <input type="text" id="cancion" name="Cancion_y_Artista" placeholder="Ej. Sparks - Coldplay" required>
+        </div>
+
+        <div class="campo">
+          <label for="disco">¿En qué disco quedaría mejor?</label>
+          <select id="disco" name="Disco_Sugerido">
+            <option value="Exámenes a la vista">Exámenes a la vista</option>
+            <option value="¿Te sientes solo?">¿Te sientes solo?</option>
+            <option value="¿Tienes sueño?">¿Tienes sueño?</option>
+            <option value="El peso del mundo">El peso del mundo</option>
+            <option value="Top música" selected>Top música</option>
+            <option value="De fondo">De fondo</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label>Elige la vibra de la canción (opcional):</label>
+          <div class="vibras-wrap" id="contenedorVibras">
+            <button type="button" class="vibra-chip" data-vibra="🌙 Nocturna">🌙 Nocturna</button>
+            <button type="button" class="vibra-chip" data-vibra="☕ Chill">☕ Chill</button>
+            <button type="button" class="vibra-chip" data-vibra="⚡ Energía">⚡ Energía</button>
+            <button type="button" class="vibra-chip" data-vibra="💔 Melancólica">💔 Melancólica</button>
+            <button type="button" class="vibra-chip" data-vibra="📚 Para estudiar">📚 Para estudiar</button>
+          </div>
+          <input type="hidden" id="vibraSeleccionada" name="Vibra" value="Sin etiqueta">
+        </div>
+
+        <div class="campo">
+          <label for="mensaje">¿Por qué la recomiendas? (opcional):</label>
+          <textarea id="mensaje" name="Mensaje" placeholder="Cuéntame qué te hace sentir esta canción..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btnEnviar">💿 Enviar recomendación</button>
+        <button type="button" class="btn-enviar btn-respaldo" id="btnCorreoDirecto">
+          ✉️ Abrir en mi correo (respaldo)
+        </button>
+      </form>
+
+      <p class="nota-activacion">Las sugerencias llegan directo a <strong>vemmanuel0987@gmail.com</strong></p>
+    </section>
+
+    <a href="index.html" class="btn-volver" id="btnVolver">⬅️ Volver al inicio</a>
+  </main>
+
+  <script>
+    const sonidoBoton = new Audio('clic.mp3');
+    const btnVolver = document.getElementById('btnVolver');
+    const form = document.getElementById('formRecomendacion');
+    const inputCancion = document.getElementById('cancion');
+    const selectDisco = document.getElementById('disco');
+    const textoPreview = document.getElementById('textoCancionPreview');
+    const badgePreview = document.getElementById('badgeDiscoPreview');
+    const vinilo = document.getElementById('viniloPreview');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const btnCorreoDirecto = document.getElementById('btnCorreoDirecto');
+
+    inputCancion.addEventListener('input', () => {
+      const valor = inputCancion.value.trim();
+      textoPreview.textContent = valor !== '' ? valor : 'Escribe una canción abajo...';
+    });
+
+    selectDisco.addEventListener('change', () => {
+      badgePreview.textContent = selectDisco.value;
+      sonidoBoton.currentTime = 0;
+      sonidoBoton.play().catch(() => {});
+    });
+
+    const chips = document.querySelectorAll('.vibra-chip');
+    const inputVibra = document.getElementById('vibraSeleccionada');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('activa'));
+        chip.classList.add('activa');
+        inputVibra.value = chip.getAttribute('data-vibra');
+        sonidoBoton.currentTime = 0;
+        sonidoBoton.play().catch(() => {});
+      });
+    });
+
+    form.addEventListener('submit', () => {
+      vinilo.classList.add('turbo');
+      btnEnviar.textContent = '💿 Grabando recomendación...';
+      sonidoBoton.currentTime = 0;
+      sonidoBoton.play().catch(() => {});
+    });
+
+    btnCorreoDirecto.addEventListener('click', () => {
+      sonidoBoton.currentTime = 0;
+      sonidoBoton.play().catch(() => {});
+
+      const nombre = document.getElementById('nombre').value.trim() || 'Anónimo';
+      const cancion = document.getElementById('cancion').value.trim() || 'Sin especificar';
+      const disco = document.getElementById('disco').value;
+      const vibra = document.getElementById('vibraSeleccionada').value;
+      const mensaje = document.getElementById('mensaje').value.trim() || 'Sin comentario extra';
+
+      const asunto = encodeURIComponent(`🎵 Recomendación: ${cancion}`);
+
+const cuerpo = encodeURIComponent(
+`Hola Víctor,
+
+De parte de: ${nombre}
+Canción y artista: ${cancion}
+Disco sugerido: ${disco}
+Vibra: ${vibra}
+
+Motivo:
+${mensaje}`
+);
+
+window.location.href = `mailto:vemmanuel0987@gmail.com?subject=${asunto}&body=${cuerpo}`;
+    });
+
+    btnVolver.addEventListener('click', (e) => {
+      e.preventDefault();
+      const destino = btnVolver.getAttribute('href');
+      sonidoBoton.currentTime = 0;
+      sonidoBoton.play().then(() => {
+        setTimeout(() => { window.location.href = destino; }, 250);
+      }).catch(() => {
+        window.location.href = destino;
+      });
+    });
+  </script>
+
+</body>
+</html>
